@@ -1,0 +1,12 @@
+; $Id: galleria.info,v 1.1.2.1 2009/05/20 16:28:15 marktheunissen Exp $
+name = Galleria
+description = Turns nodes into Galleria galleries, a javascript image gallery.
+package = "jQuery"
+core = 6.x
+
+; Information added by drupal.org packaging script on 2009-06-09
+version = "6.x-1.0"
+core = "6.x"
+project = "galleria"
+datestamp = "1244538640"
+

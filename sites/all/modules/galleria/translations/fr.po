@@ -1,0 +1,275 @@
+# French translation of Galleria
+# Copyright 2009 Jean-Philippe Fleury <contact@jpfleury.net>
+# Generated from files:
+#  galleria.admin.inc,v 1.1.2.10 2009/05/18 08:34:16 marktheunissen
+#  galleria.module,v 1.1.2.28 2009/06/02 10:04:02 marktheunissen
+#  galleria.info,v 1.1.2.1 2009/05/20 16:28:15 marktheunissen
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"POT-Creation-Date: 2009-06-06 15:06-0400\n"
+"PO-Revision-Date: 2009-06-06 15:06-0400\n"
+"Last-Translator: Jean-Philippe Fleury <contact@jpfleury.net>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n>1);\n"
+
+#: galleria.admin.inc:20
+msgid "Help"
+msgstr "Aide"
+
+#: galleria.admin.inc:21
+msgid "To customize Galleria position on a page (e.g. if you want to have Galleria placed below the node body), install the CCK module and rearrange fields for the content type that has Galleria enabled."
+msgstr "Pour paramétrer la position de Galleria dans la page (par exemple si vous désirez placer Galleria sous le corps du noeud), installer le module CCK et réordonner les champs du type de contenu pour lequel Galleria est activé."
+
+#: galleria.admin.inc:27
+msgid "Main options"
+msgstr "Options principales"
+
+#: galleria.admin.inc:32
+msgid "Opacity of thumbnails"
+msgstr "Opacité des vignettes"
+
+#: galleria.admin.inc:35
+msgid "Value from 0 .. 1"
+msgstr "Valeur de 0 .. 1"
+
+#: galleria.admin.inc:40
+msgid "Galleria warnings"
+msgstr "Avertissements de Galleria"
+
+#: galleria.admin.inc:42
+msgid "Show warning and error messages on Gallerias if they aren't configured properly."
+msgstr "Afficher les messages d'avertissement et d'erreur dans les Gallerias si ces derniers ne sont pas configurés correctement."
+
+#: galleria.admin.inc:49;141;168
+msgid "None"
+msgstr "Aucun"
+
+#: galleria.admin.inc:59
+msgid "ImageCache integration"
+msgstr "Intégration d'ImageCache"
+
+#: galleria.admin.inc:63
+msgid "Galleria can integrate with the ImageCache module to control the appearance of uploaded images and their thumbnails."
+msgstr "Galleria peut interagir avec le module ImageCache pour contrôler l'apparence des images téléversées et de leurs vignettes."
+
+#: galleria.admin.inc:67
+msgid "ImageCache gallery preset"
+msgstr "Configuration des galeries ImageCache"
+
+#: galleria.admin.inc:74
+msgid "ImageCache thumbnail preset"
+msgstr "Configuration des vignettes ImageCache"
+
+#: galleria.admin.inc:80
+msgid "Install the ImageCache module to control the appearance of uploaded images and their thumbnails."
+msgstr "Installer le module ImageCache pour contrôler l'apparence des images téléversées et de leurs vignettes."
+
+#: galleria.admin.inc:87
+msgid "jCarousel integration"
+msgstr "Intégration de jCarousel"
+
+#: galleria.admin.inc:91
+msgid "Galleria can integrate with the jCarousel module to display thumbnails in a scrolling carousel."
+msgstr "Galleria peut interagir avec le module jCarousel pour afficher les vignettes dans un carrousel défilant."
+
+#: galleria.admin.inc:95
+msgid "jCarousel Integration"
+msgstr "Intégration de jCarousel"
+
+#: galleria.admin.inc:97 galleria.module:92
+msgid "Enabled"
+msgstr "Activé"
+
+#: galleria.admin.inc:98 galleria.module:92
+msgid "Disabled"
+msgstr "Désactivé"
+
+#: galleria.admin.inc:105
+msgid "Orientation"
+msgstr "Orientation"
+
+#: galleria.admin.inc:107
+msgid "Horizontal"
+msgstr "Horizontal"
+
+#: galleria.admin.inc:108
+msgid "Vertical"
+msgstr "Vertical"
+
+#: galleria.admin.inc:115;203
+msgid "Limit of visible thumbnails"
+msgstr "Limite des vignettes visibles"
+
+#: galleria.admin.inc:118
+msgid "Thumbnails will be cropped so exactly this number of thumbnails is always shown. Must be an integer greater than zero."
+msgstr "Les vignettes seront rognées, donc le nombre de vignettes affichées sera toujours équivalent à ce nombre. Doit être une valeur entière plus grande que 0."
+
+#: galleria.admin.inc:123;204
+msgid "Scroll size"
+msgstr "Taille du défilement"
+
+#: galleria.admin.inc:126
+msgid "The number of thumbnails to scroll with each mouse click."
+msgstr "Le nombre de vignettes à faire défiler lors de chaque clic."
+
+#: galleria.admin.inc:131
+msgid "Animation speed"
+msgstr "Vitesse de l'animation"
+
+#: galleria.admin.inc:134
+msgid "The speed of the scroll animation. Use \"slow\", \"normal\", \"fast\", or the number of milliseconds (ie. \"100\"). If set to 0, animation is turned off."
+msgstr "La vitesse de l'animation de défilement. Utiliser «slow», «normal», «fast» ou un nombre en millisecondes (par exemple «100»). Si la valeur est 0, l'animation est désactivée."
+
+#: galleria.admin.inc:139
+msgid "Wrap"
+msgstr "Boucler"
+
+#: galleria.admin.inc:142
+msgid "Left"
+msgstr "Gauche"
+
+#: galleria.admin.inc:143
+msgid "Right"
+msgstr "Droite"
+
+#: galleria.admin.inc:144
+msgid "Both"
+msgstr "Les deux"
+
+#: galleria.admin.inc:147
+msgid "Specifies whether to wrap at the first/last item (or both) and jump back to the start/end."
+msgstr "Spécifie si on doit boucler au premier/dernier élément (ou les deux) et revenir au début/à la fin."
+
+#: galleria.admin.inc:151
+msgid "Install the jCarousel module to display Galleria thumbnails in a scrolling carousel."
+msgstr "Installer le module jCarousel pour afficher les vignettes de Galleria dans un carrousel défilant."
+
+#: galleria.admin.inc:158
+msgid "Lightbox integration"
+msgstr "Intégration de Lightbox"
+
+#: galleria.admin.inc:162
+msgid "Galleria can integrate with the Lightbox2 and jQuery Lightbox modules to let users open Galleria images in a Lightbox."
+msgstr "Galleria peut interagir avec les modules Lightbox2 et jQuery Lightbox pour permettre aux utilisateurs d'ouvrir les images de Galleria dans un Lightbox."
+
+#: galleria.admin.inc:166
+msgid "Lightbox module"
+msgstr "Module Lightbox"
+
+#: galleria.admin.inc:171
+msgid "Select the Lightbox module that you would like to integrate with Galleria."
+msgstr "Sélectionner le module Lightbox que vous souhaiteriez intégrer à Galleria."
+
+#: galleria.admin.inc:174
+msgid "Lightbox2"
+msgstr "Lightbox2"
+
+#: galleria.admin.inc:177
+msgid "jQuery Lightbox"
+msgstr "jQuery Lightbox"
+
+#: galleria.admin.inc:183
+msgid "Lightbox ImageCache preset"
+msgstr "Configuration du Lightbox d'ImageCache"
+
+#: galleria.admin.inc:186
+msgid "Select the ImageCache preset to display in Galleria Lightboxes."
+msgstr "Sélectionner la configuration d'ImageCache pour l'affichage dans les Lightbox de Galleria."
+
+#: galleria.admin.inc:191
+msgid "Install the Lightbox2 or jQuery Lightbox module to let users open Galleria images in a Lightbox."
+msgstr "Installer les modules Lightbox2 et jQuery Lightbox pour permettre aux utilisateurs d'ouvrir les images de Galleria dans un Lightbox."
+
+#: galleria.admin.inc:219
+msgid "\"Limit of visible thumbnails\" must be greater than zero."
+msgstr "«Limite des vignettes visibles» doit être plus grand que 0."
+
+#: galleria.admin.inc:230
+msgid "\"Animation speed\" must be \"slow\", \"normal\", \"fast\", or an integer value."
+msgstr "\"Vitesse de l'animation\" doit être «slow», «normal», «fast» ou une valeur entière."
+
+#: galleria.module:69
+msgid "Invalid Galleria: at least one attachment must be an image. See README.txt for help."
+msgstr "Galleria invalide: au moins un fichier atatché doit être une image. Voir le fichier README.txt pour l'aide."
+
+#: galleria.module:73
+msgid "Invalid Galleria: there are no attachments. See README.txt for help."
+msgstr "Galleria invalide: il n'y a aucun fichier attaché. Voir le fichier README.txt pour l'aide."
+
+#: galleria.module:77
+msgid "Invalid Galleria: not a node. See README.txt for help."
+msgstr "Invalid Galleria: n'est pas un noeud. Voir le fichier README.txt pour l'aide."
+
+#: galleria.module:90
+msgid "Galleria from attachments"
+msgstr "Galleria à partir des fichiers attachés"
+
+#: galleria.module:93
+msgid "Convert attachments on this node type into Gallerias. You should not enable this if you are using a CCK ImageField for your Galleria."
+msgstr "Convertir les fichiers attachés de ce type de noeud en Gallerias. Vous ne devriez pas activer cette option si vous utilisez un champ ImageField de CCK pour votre Galleria."
+
+#: galleria.module:175
+msgid "Node type is not selected as a Galleria. See README.txt for help."
+msgstr "Le type de noeud n'est pas sélectionné comme un Galleria. Voir le fichier README.txt pour l'aide."
+
+#: galleria.module:191
+msgid "Gallery"
+msgstr "Galerie"
+
+#: galleria.module:192
+msgid "The Galleria display."
+msgstr "L'affichage de Galleria."
+
+#: galleria.module:219
+msgid "Gallerias only display when viewing a node by itself on the page. See README.txt for help."
+msgstr "Les Gallerias s'affichent seulement quand un noeud est consulté seul sur une page. Voir le fichier README.txt pour l'aide."
+
+#: galleria.module:231
+msgid "Invalid arguments passed to theme_galleria_lightbox_link."
+msgstr "Arguments invalides transmis à theme_galleria_lightbox_link."
+
+#: galleria.module:236
+msgid "Please install the Lightbox2 module to enable this functionality"
+msgstr "Veuillez installer le module Lightbox2 pour activer cette fonctionnalité."
+
+#: galleria.module:348
+msgid "previous"
+msgstr "précédent"
+
+#: galleria.module:349
+msgid "next"
+msgstr "suivant"
+
+#: galleria.module:371 galleria.info:0
+msgid "Galleria"
+msgstr "Galleria"
+
+#: galleria.module:123
+msgid "administer galleria"
+msgstr "Administrer galleria"
+
+#: galleria.module:137
+msgid "Galleria settings"
+msgstr "Configuration de Galleria"
+
+#: galleria.module:138
+msgid "Change the Galleria settings"
+msgstr "Modifier la configuration de Galleria"
+
+#: galleria.module:0
+msgid "galleria"
+msgstr "galleria"
+
+#: galleria.info:0
+msgid "Turns nodes into Galleria galleries, a javascript image gallery."
+msgstr "Transforme les noeuds en galeries Galleria, une galerie d'images en javascript."
+
+#: galleria.info:0
+msgid "jQuery"
+msgstr "jQuery"
+

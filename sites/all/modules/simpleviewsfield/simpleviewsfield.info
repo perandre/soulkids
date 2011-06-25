@@ -1,0 +1,7 @@
+; $Id$
+name = Simpleviews field
+description = Define fields that insert Simpleviews into nodes.
+dependencies[] = content
+dependencies[] = simpleviews
+package = CCK
+core = 6.x

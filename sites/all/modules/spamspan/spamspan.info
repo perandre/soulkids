@@ -1,0 +1,11 @@
+name = SpamSpan
+description = "The SpamSpan module obfuscates email addresses to help prevent spambots from collecting them.  It implements the technique at http://www.spamspan.com."
+package = "Input filters"
+dependencies[] = filter
+core = 6.x
+; Information added by drupal.org packaging script on 2009-10-10
+version = "6.x-1.5-beta2"
+core = "6.x"
+project = "spamspan"
+datestamp = "1255210855"
+

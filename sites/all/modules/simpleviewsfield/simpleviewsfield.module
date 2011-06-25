@@ -1,0 +1,480 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Create a simpleviews CCK field to set up simpleview
+ * settings in the widget and display the resulting
+ * view(s) in the node.
+ */
+/**
+ * Implementation of hook_field_info().
+ */
+function simpleviewsfield_field_info() {
+  return array(
+    'simpleviewsfield' => array(
+      'label' => t('Simpleviews field'),
+      'description' => t('Store simpleviews references in a field so those simpleviews can be displayed in nodes.'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function simpleviewsfield_field_settings($op, $field) {
+  switch ($op) {
+
+    // Define the database storage for this field using 
+    // the same construct used by schema API. 
+    case 'database columns':
+      $columns['svid'] = array(
+        'type' => 'int', 
+        'not null' => FALSE, 
+        'sortable' => FALSE, 
+        'views' => FALSE,
+      );
+      return $columns;
+
+    // We aren't going to try to display views in views,
+    // no views data for this field.
+    case 'views data':
+      return array();
+  }
+}
+
+/**
+ * Implementation of hook_field().
+ */
+function simpleviewsfield_field($op, &$node, $field, &$items, $teaser, $page) {
+  switch ($op) {
+    case 'insert':
+      // We don't know the nid of a newly inserted node
+      // until this point, so update some simpleview values
+      // that depend on that information.
+      foreach ($items as $delta => $item) {
+        $simpleview = simpleviewsfield_load($item);
+        simpleviewsfield_save($simpleview, $node, $field, $item, $delta);
+      }
+      simpleviewsfield_clear();
+      break;
+              
+    case 'delete':
+      simpleviewsfield_delete($items);
+      simpleviewsfield_clear();
+      break;
+  }
+}
+
+/**
+ * A helper array to find simpleviews node and field data
+ * from the svid, nid, or field name.
+ */
+function simpleviewsfield_data($reset = FALSE) {
+  if (!$reset && $cached = cache_get('simpleviewsfield_data', 'cache')) {
+    $data = $cached->data;
+  }
+  else {
+    $data = array('svids' => array(), 'nids' => array(), 'field_names' => array());
+    $result = db_query("SELECT * FROM {simpleviews} WHERE path LIKE('node/%')");
+    while ($row = db_fetch_object($result)) {
+      $svid = $row->svid;
+      $path = explode('/', $row->path);
+      $item = $row;
+      $item->nid = $path[1];
+      $item->field_name = $path[2];
+      $item->delta = $path[3];
+      $data['svids'][$svid] = $item;
+      $data['nids'][$item->nid][$svid] = $item;
+      $data['field_names'][$item->field_name][$svid] = $item;
+    }
+    cache_set('simpleviewsfield_data', $data, 'cache');
+  }
+  return $data;
+}
+
+function simpleviewsfield_clear() {
+  cache_clear_all('simpleviewsfield_data', 'cache', TRUE);
+  simpleviewsfield_data(TRUE);
+}
+
+/**
+ * Implementation of hook_content_is_empty().
+ */
+function simpleviewsfield_content_is_empty($item, $field) {
+  if (empty($item['svid'])) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function simpleviewsfield_field_formatter_info() {
+  return array(
+    'default' => array(
+      'label' => t('Default'),
+      'field types' => array('simpleviewsfield'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function simpleviewsfield_theme() {
+  return array(
+    // Themes for the formatters.
+    'simpleviewsfield_formatter_default' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'simpleviewsfield_view' => array(
+      'arguments' => array('element' => NULL, 'display' => NULL),
+    ),   
+    'simpleviewsfield_edit_form' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+}
+
+/**
+ * Theme functions for simpleviewsfield 
+ * formatters. Pass the right display to
+ * the basic theme.
+ */
+function theme_simpleviewsfield_formatter_default($element) {
+  return theme('simpleviewsfield_view', $element, 'page');
+}
+
+/**
+ * The common theme for displaying the view,
+ * once the display has been identified.
+ */
+function theme_simpleviewsfield_view($element, $display) {
+  $item = $element['#item'];
+  $content = '';
+  
+  // Has this view been filtered by an argument?
+  // We rewrote the view summary arguments to pass
+  // this information in the $_GET.
+  if (!empty($_GET['argument']) && !empty($_GET['svid']) && 
+  $_GET['svid'] == $item['svid']) {
+    $output = views_embed_view('simpleviews_'. $item['svid'], $display, $_GET['argument']);
+  }
+  else {
+    $output = views_embed_view('simpleviews_'. $item['svid'], $display);
+  }
+  if (!empty($output)) {
+    $content = "<div class='simpleviewsfield-view-wrapper'>" . $output . "</div>";
+  }
+  return $content;   
+}
+
+
+/**
+ * Overload the Views summary view preprocessor.
+ * 
+ * Preprocess theme function to rewrite Views
+ * summary arguments to point to the right 
+ * locations for our view embedded in a node.
+ */
+function simpleviewsfield_preprocess_views_view_summary(&$vars) {
+  $view = $vars['view'];
+  
+  // Not a simpleviews view, do nothing.
+  if (!$test = explode('simpleviews_', $view->name)) {
+    return;
+  }
+  // Not a simpleviewsfield view, do nothing.
+  $data = simpleviewsfield_data();
+  $simpleviewsfield_vids = array_keys($data['svids']);
+  if (!in_array($test[1], $simpleviewsfield_vids)) {
+    return;
+  }
+  
+  // Rewrite the url for our summary arguments.
+  // The argument needs to be rewritten as a query 
+  // so it will work in aliased node paths, plus
+  // we need a way to distinguish between different
+  // arguments provided if there are multiple views 
+  // on the page.
+  $svid = $test[1];
+  $sdata = $data['svids'][$svid];
+  $rows = $vars['rows'];
+  foreach ($rows as $key => $row) {
+    // Add new parameters to $_GET and rewrite the url.
+    // Add 'svid' and 'argument' so we know which
+    // argument goes with which view.
+    // This routine may get called more than once,
+    // so don't actually alter the $_GET.
+    $new_get = $_GET;
+    $new_get['svid'] = $svid;
+    $arg = explode($sdata->path .'/', $row->url);
+    $new_get['argument'] = $arg[1];
+    $query = drupal_query_string_encode($new_get, array('q'));
+    $path = drupal_get_path_alias(isset($new_get['q']) ? $new_get['q'] : '');
+    if ($query != '') {
+      $path .= '?'. $query;
+    }
+    $vars['rows'][$key]->url = base_path() . $path;
+  }
+}
+
+/**
+ * Implementation of hook_simpleview_alter().
+ */
+function simpleviewsfield_simpleview_alter(&$view, $simpleview) {
+  static $count;
+  $count++;
+
+  // Is this one of the views this module created?
+  $data = simpleviewsfield_data();
+  if (!array_key_exists($simpleview['svid'], $data['svids'])) {
+    return;
+  }
+    
+  foreach ($view->display as $display_id => $display) {
+    $handler = $display->handler;
+    
+    // Make sure each field has its own pager.
+    $handler->override_option('use_pager', 1);
+    $handler->override_option('pager_element', $count);
+    
+    // TODO Do we want caching or not?
+    $handler->override_option('block_caching', -1);
+  }
+  
+  // Avoid recursion, don't allow a view of the current content type.
+  if ($simpleview['filter'] == 'all') {
+    $path = explode('/', $simpleview['path']);
+    $nid = $path[1];
+    $field_name = $path[2];
+    $delta = $path[3];
+    $node = node_load($nid);
+    $type = $node->type;
+    $display = $view->display['default'];
+    $filters['type'] = array(
+      'operator' => 'not in',
+      'value' => array($type => $type),
+      'group' => '0',
+      'exposed' => FALSE,
+      'expose' => array('operator' => FALSE, 'label' => ''),
+      'id' => 'type',
+      'table' => 'node',
+      'field' => 'type',
+      'relationship' => 'none',
+    );
+    
+    $display->handler->override_option('filters', $filters);  
+  }
+}
+
+
+/**
+ * Implementation of hook_widget_info().
+ */
+function simpleviewsfield_widget_info() {
+  return array(
+    'simpleviewsfield_widget' => array(
+      'label' => t('Simpleviews form'),
+      'field types' => array('simpleviewsfield'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+      'callbacks' => array(
+        // No default value for this widget.
+        // It would be too confusing to try to
+        // identify and display a default view.
+        'default value' => CONTENT_CALLBACK_NONE,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_widget().
+ */
+function simpleviewsfield_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  // Add the simpleviews form css.
+  drupal_add_css(drupal_get_path('module', 'simpleviews') . '/simpleviews.css');
+  
+  $node = $form['#node'];
+  $simpleview = simpleviewsfield_load($items[$delta]);
+  $element['simpleview'] = simpleviews_get_edit_form($simpleview);
+  $element['simpleview']['#tree'] = TRUE;
+  $element['simpleview']['#type'] = 'fieldset';
+  $element['simpleview']['#title'] = check_plain(t($field['widget']['label']));
+  
+  // Avoid recursion, don't allow a view of the current content type.
+  unset($element['simpleview']['filter']['#options']['node:' . $form['#node']->type]);
+  
+  // This is for the page title, also used as the view title
+  // in the Simpleviews overview, we'll handle that automatically.
+  $element['simpleview']['title']['#type'] = 'value';
+  $element['simpleview']['title']['#value'] = $element['simpleview']['title']['#default_value'];
+
+  // The path is the node path, we'll handle that automatically.
+  $element['simpleview']['path']['#type'] = 'value';
+  $element['simpleview']['path']['#value'] = $element['simpleview']['path']['#default_value'];
+   
+  $element['svid'] = array(
+    '#type' => 'hidden',
+    '#default_value' => isset($items[$delta]['svid']) ? $items[$delta]['svid'] : NULL,
+  );
+  
+  $element['#element_validate'] = array('simpleviewsfield_validate');
+  
+  // The simpleviews show/hide js won't work in our field,
+  // so we'll create a customized alternative.
+  $element['simpleview']['#theme'] = 'simpleviewsfield_edit_form';
+  $element['simpleview']['#field_name'] = $field['field_name'];
+  $element['simpleview']['#delta'] = $delta;
+  $element['simpleview']['#node'] = $node;
+  $element['simpleview']['#field'] = $field;
+  
+  return $element;  
+}
+
+/**
+ * Simple theme wrapper for the simpleview edit form, adds JS.
+ * There is probably a better way to make sure each field
+ * and delta combination has its own behavior, 
+ * but this works for now.
+ */
+function theme_simpleviewsfield_edit_form($form) {
+  $field_name = str_replace('_', '-', $form['#field_name']) .'-'. $form['#delta'];
+  
+  $js = <<<EOM
+jQuery(document).ready(function(){
+  jQuery("#edit-$field_name-simpleview-argument-arg-toggle").bind("change", function() {
+    if (this.checked) {
+      $("#$field_name-simpleviews-arg-wrapper").show();
+    }
+    else {
+      $("#$field_name-simpleviews-arg-wrapper").hide();
+    }
+    return false;
+  })
+});
+EOM;
+  drupal_add_js($js, 'inline');
+  
+  $extra = empty($form['argument']['argument']['#default_value']) ? ' class="js-hide"' : '';
+  $form['argument']['argument']['#prefix'] = '<div id="'. $field_name .'-simpleviews-arg-wrapper"' . $extra . '>';
+  $form['argument']['argument']['#suffix'] = '</div>';
+
+  $output .= '<div id="simpleviews-elements">' . drupal_render($form) . '</div>';
+  return $output;
+}
+
+/**
+ * Validation is where we store the simpleview data
+ * to the simpleviews table because the simpleviews
+ * widget is not really a part of the field.
+ */
+function simpleviewsfield_validate($form, &$form_state) {
+  $node = $form['simpleview']['#node'];
+  $field = $form['simpleview']['#field'];
+  $delta = $form['simpleview']['#delta'];
+  
+  // Recurse down to find the simpleviews settings.
+  $item = $form_state['values'];
+  foreach ($form['#parents'] as $key) {
+    $item = $item[$key];
+  }
+  
+  $simpleview = $item['simpleview'];
+  if (!empty($item['svid'])) {
+    $simpleview['svid'] = $item['svid'];
+  }
+  $simpleview['argument'] = empty($simpleview['argument']['arg_toggle']) ? '' : $simpleview['argument']['argument'];
+  
+  // Save the simpleviews values and unset 
+  // the simpleviews widget.
+  $simpleview = simpleviewsfield_save($simpleview, $node, $field, $item, $delta);
+  $svid = $simpleview['svid'];
+  unset($form['simpleview']);
+  
+  // A new svid may have been created for a new
+  // view, so make sure it gets saved in the field.
+  form_set_value($form['svid'], $svid, $form_state);
+}
+
+/**
+ * Helper function to load a simpleview for
+ * a simpleviewsfield.
+ */
+function simpleviewsfield_load($item) {
+  $simpleview = array();
+  if (!empty($item['svid'])) {
+    $simpleview = simpleviews_item_load($item['svid']);
+  }
+  return $simpleview;  
+}
+
+/**
+ * Helper function to save a simpleview for
+ * a simpleviewsfield.
+ */
+function simpleviewsfield_save($simpleview, $node, $field, $item, $delta) {
+  // We sometimes get to this point before the node is created.
+  if (empty($node)) {
+    $node = new stdClass();
+    $node->nid = 0;
+  }
+  // Create a 'path' even though we won't really use it.
+  // Needed so that Views properly handles arguments 
+  // and links and can create rss feeds.
+  $simpleview['path'] = t('node/!nid/!field_name/!delta', array(
+    '!nid' => $node->nid, 
+    '!field_name' => $field['field_name'], 
+    '!delta' => $delta));
+    
+  // Create a title if there isn't one so that it makes
+  // sense in the Simpleviews overview form.  
+  if (empty($simpleview['title'])) {
+    $simpleview['title'] = t('Simpleviewsfield: @label', array('@label' => check_plain(t($field['widget']['label']))));
+  }
+  return simpleviews_item_save((array) $simpleview);
+}
+
+/**
+ * Helper function to delete a simpleview
+ * for a simpleviewsfield.
+ */
+function simpleviewsfield_delete($items) {
+  foreach ($items as $delta => $item) {
+    if (!empty($item['svid'])) {
+      simpleviews_item_delete($item['svid']);
+    }
+  } 
+}
+
+/**
+ * Implementation of hook_form_alter().
+ * 
+ * Adapt the Simpleviews overview form for views
+ * created by this field.
+ */
+function simpleviewsfield_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'simpleviews_overview_form') {
+    $data = simpleviewsfield_data();
+    foreach ($form['items'] as $svid => $item) {
+      if (array_key_exists($svid, $data['svids'])) {
+        $sdata = $data['svids'][$svid];
+        // Swap the edit and delete buttons in the Simpleviews
+        // overview form out and replace with a link to 
+        // edit the node that created the item.
+        $path = drupal_get_path('module', 'simpleviews') . '/images/';
+        $links = array();
+        $links[] = array(
+          'title' => theme('image', $path . 'text-editor.png', t('Edit')),
+          'href' => 'node/'. $sdata->nid .'/edit',
+          'html' => TRUE,
+        );
+        $form['items'][$svid]['operations']['#value'] = theme('links', $links);
+      }
+    }
+  }
+}
+

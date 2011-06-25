@@ -1,0 +1,91 @@
+<?php
+
+// $Id: flvmediaplayer.install,v 1.1.2.6.2.2.2.5 2008/12/19 18:04:53 arthuregg Exp $
+
+/**
+ * Implementation of hook_schema().
+ */
+function flvmediaplayer_schema() {
+
+  $schema['flvmediaplayer_node'] = array(
+    'description' => t('Stores node data'),
+    'fields' => array(
+      'nid' => array(
+        'description' => t('Node Id'),
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'config' => array(
+        'description' => t('Node configuration data'),
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => FALSE,
+      ),
+    ),
+  );
+
+  $schema['flvmediaplayer_profiles'] = array(
+    'description' => t('Stores the profile data.'),
+    'fields' => array(
+      'pid' =>  array('type' => 'serial'),
+      'type' => array(
+        'description' => t('Description of the profile'),
+        'type' => 'varchar',
+        'length' => 255,
+        ),
+      'name' => array(
+        'description' => t('Name of the profile'),
+        'type' => 'varchar',
+        'length' => 255,
+        ),
+      'config' => array(
+        'description' => t('Configuration data'),
+        'type' => 'text',
+        'size' => 'medium',
+        ),
+     ),
+     'primary key' => array ('pid'),
+  );
+
+  // cache schema
+  $schema['cache_flvmediaplayer'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_flvmediaplayer']['description'] = t('Cache table for the FLV Media PLayer module to store configuration and node data');
+
+  return $schema;
+}
+
+/**
+ * implementation of hook_uninstall()
+ */
+function flvmediaplayer_uninstall() {
+  // Remove tables.
+  drupal_uninstall_schema('flvmediaplayer');
+
+  // Remove tables.
+  drupal_uninstall_schema('flvmediaplayer');
+  variable_del('flvmediaplayer_%');
+  variable_del('flvmp_%');
+}
+
+
+/**
+ * implementation of hook_install
+ */
+function flvmediaplayer_install() {
+  // Create tables.
+  drupal_install_schema('flvmediaplayer');
+}
+
+
+/**
+ * update the player path to the new file name
+ */
+function flvmediaplayer_update_6000() {
+  $oldplayer = variable_get('flvmediaplayer_player', 'jw_player_4.x.player') ;
+  $pattern = '/.player$/';
+  variable_set('flvmediaplayer_player', preg_replace($pattern, '.inc', $oldplayer));
+  drupal_set_message(t('Updated your player path to the new format'));
+  return array();
+}
+
+

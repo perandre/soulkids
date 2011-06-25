@@ -1,0 +1,13 @@
+; $Id: plugin_manager.info,v 1.2.2.5 2008/09/23 02:25:53 jabapyth Exp $
+name = Plugin Manager
+description = Enables the automated installation of modules and themes from drupal.org
+core = 6.x
+php = 5
+package = Administration
+
+; Information added by drupal.org packaging script on 2009-01-15
+version = "6.x-1.9"
+core = "6.x"
+project = "plugin_manager"
+datestamp = "1232034636"
+

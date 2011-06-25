@@ -1,0 +1,28 @@
+# Norwegian Bokmål translation of Admin (6.x-2.0-alpha5)
+# Copyright (c) 2010 by the Norwegian Bokmål translation team
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Admin (6.x-2.0-alpha5)\n"
+"POT-Creation-Date: 2010-01-28 12:20+0000\n"
+"PO-Revision-Date: 2009-09-06 02:01+0000\n"
+"Language-Team: Norwegian Bokmål\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+msgid "Administer"
+msgstr "Administrer"
+msgid "Administration"
+msgstr "Administrering"
+msgid "Horizontal"
+msgstr "Horisontal"
+msgid "Vertical"
+msgstr "Vertikal"
+msgid "Add block"
+msgstr "Opprett blokk"
+msgid "Create content"
+msgstr "Opprett innhold"
+msgid "Position"
+msgstr "Posisjon"

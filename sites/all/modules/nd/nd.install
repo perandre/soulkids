@@ -1,0 +1,29 @@
+<?php
+// $Id: nd.install,v 1.1.2.4 2009/10/24 16:02:43 swentel Exp $
+
+/**
+ * @file
+ * Node displays install file.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function nd_install() {
+  $install_text = 'Installation of Node displays is done. Please remember: if in the future you decide
+  to implement your own hook_preprocess functions which run after the modulename_preprocess_hook,
+  you might run into a racing condition problem where data won\'t be updated. Read !url for a solution.';
+
+  drupal_set_message(t($install_text, array('!url' => l('http://drupal.org/node/572614', 'http://drupal.org/node/572614'))));
+
+  // RSS doesn't have all regions.
+  variable_set('ds_build_mode_4', 'not_all');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function nd_uninstall() {
+  db_query("DELETE FROM {variable} WHERE name LIKE 'nd_%%'");
+  variable_del('ds_build_mode_4');
+}

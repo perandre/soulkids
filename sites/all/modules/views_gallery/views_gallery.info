@@ -1,0 +1,20 @@
+; $Id: views_gallery.info,v 1.1 2009/07/23 21:36:42 karens Exp $
+name = Views Gallery
+description = Add a Views image gallery to your website.
+core = 6.x
+package = Views
+dependencies[] = imagefield
+dependencies[] = content
+dependencies[] = content_copy
+dependencies[] = nodereference
+dependencies[] = nodereference_url
+dependencies[] = views
+dependencies[] = views_attach
+dependencies[] = token
+
+; Information added by drupal.org packaging script on 2009-07-24
+version = "6.x-1.0"
+core = "6.x"
+project = "views_gallery"
+datestamp = "1248442099"
+

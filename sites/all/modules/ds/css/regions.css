@@ -1,0 +1,69 @@
+/* $Id: regions.css,v 1.1.2.3 2010/01/06 13:46:20 swentel Exp $ */
+
+.ds-region-header {
+  clear: both;
+}
+
+.ds-region-left {
+  clear: left;
+  float: left;
+}
+
+.ds-region-middle {
+  clear: none;
+}
+
+.ds-region-right {
+  float: right;
+}
+
+.ds-region-footer {
+  clear: both;
+}
+
+/* default region dimensions */
+
+.ds-region-left {
+  width: 25%;
+}
+
+.ds-region-right {
+  width: 25%;
+}
+
+/* middle region */
+
+.node .no-sidebars {
+  clear: left;
+}
+
+.node .sidebar-left {
+  margin-left: 25%;
+}
+
+.node .sidebar-right {
+  margin-right: 25%;
+  clear: left;
+}
+
+.node .two-sidebars {
+  margin-left: 25%;
+  margin-right: 25%;
+}
+
+/* Region inner divs. Add borders, padding and margin here */
+
+.ds-region-header .ds-region-inner {
+}
+
+.ds-region-left .ds-region-inner {
+}
+
+.ds-region-middle .ds-region-inner {
+}
+
+.ds-region-right .ds-region-inner {
+}
+
+.ds-region-footer .ds-region-inner {
+}

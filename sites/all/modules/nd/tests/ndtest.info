@@ -1,0 +1,13 @@
+; $Id: ndtest.info,v 1.1.2.1 2010/01/26 17:27:44 swentel Exp $
+name = "Node displays TEST"
+description = "Test module for Node Displays, do not enable this on production sites."
+core = "6.x"
+dependencies[] = ds
+package = "Display suite"
+
+; Information added by drupal.org packaging script on 2010-01-30
+version = "6.x-2.x-dev"
+core = "6.x"
+project = "nd"
+datestamp = "1264810299"
+

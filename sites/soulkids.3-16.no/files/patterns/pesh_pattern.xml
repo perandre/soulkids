@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<pattern>
+  <info>
+    <title>pesh media pattern</title>
+    <description>Oppdatert pattern for standard Drupalinstallasjon.</description>
+    <author>perandre</author>
+    <author_email>perandre@peshmedia.no</author_email>
+    <version>0.1</version>
+    <category>Examples</category>
+    <core>6.x</core>    
+  </info>
+  
+  <modules>  
+    <module>taxonomy</module>
+    <module>menu</module>
+    <module>search</module>
+    <module>addanother</module>
+    <module>admin_menu</module>
+    <module>advanced_help</module>
+    <module>backup_migrate</module>
+    <module>calendar</module>
+    <module>content</module>
+    <module>nodereference</module>
+    <module>number</module>
+    <module>optionwidgets</module>
+    <module>text</module>
+    <module>contemplate</module>
+    <module>ctools</module>
+    <module>custom_search_box</module>
+    <module>date</module>
+    <module>date_popup</module>
+    <module>filefield</module>
+    <module>filefield_insert</module>
+    <module>image</module>
+    <module>imageapi</module>
+    <module>imageapi_gd</module>
+    <module>imagecache</module>
+    <module>imagecache_ui</module>
+    <module>imagefield</module>
+    <module>menutrails</module>
+    <module>nodequeue</module>
+    <module>panels</module>
+    <module>pathauto</module>
+    <module>patterns</module>
+    <module>plugin_manager</module>
+    <module>poormanscron</module>
+    <module>search_config</module>
+    <module>stringoverrides</module>
+    <module>swftools</module>
+    <module>token</module>
+    <module>views</module>
+    <module>views_ui</module>
+    <module>webform</module>
+    <module>wysiwyg</module>
+    <module>xmlsitemap</module>
+  </modules>
+  
+  <actions>
+
+    <imagecache_preset>
+      <name>lite</name>
+    </imagecache_preset>
+
+    <imagecache_action>
+      <preset>lite</preset>
+      <name>imagecache_scale_and_crop</name>
+      <width>80px</width>
+      <height>80px</height>
+      <xoffset>center</xoffset>
+      <yoffset>center</yoffset>
+      <weight>-10</weight>
+    </imagecache_action>
+    
+    <imagecache_preset>
+      <name>stort</name>
+    </imagecache_preset>
+
+    <imagecache_action>
+      <preset>stort</preset>
+      <name>imagecache_scale_and_crop</name>
+      <width>500px</width>
+      <height>400px</height>
+      <xoffset>center</xoffset>
+      <yoffset>center</yoffset>
+      <weight>-9</weight>
+    </imagecache_action>
+
+    <content>
+      <name>Statisk side</name>
+      <type>statisk</type>
+      <description>Enkeltstående sider som som sjelden endres (f.eks. Om oss).</description>
+      <status>1</status>
+      <promote>1</promote>
+      <title_label>Tittel</title_label>
+      <body_label>Description</body_label>
+      <has_body>1</has_body> <!-- this will override (clear) body_label field value even if it's defined within the same action-->
+      <comment>0</comment>
+      <upload>0</upload>
+    </content>
+
+    <group>
+      <type>statisk</type>
+      <name>patterns_test</name>
+      <label>Patterns Test Group</label>
+      <weight>10</weight>
+      <style>fieldset_collapsed</style>
+      <form_description>This description goes to the node form.</form_description>
+      <display_description>This description goes to the node display.</display_description>
+    </group>
+
+    <field>
+      <type>statisk</type>
+      <name>bilde</name>
+      <label>Bilde</label>
+      <option>filefield</option>
+      <widget>imagefield_widget</widget>
+      <weight>8</weight>
+      <group>patterns_test</group>
+      <file_extensions>jpg jpeg png</file_extensions>
+      <file_path>images</file_path>
+      <max_filesize_per_file>4M</max_filesize_per_file>              
+      <max_filesize_per_node>20M</max_filesize_per_node>
+      <min_resolution>640x480</min_resolution>
+      <max_resolution>1800x1800</max_resolution>
+      <custom_alt>1</custom_alt>
+      <custom_title>1</custom_title>
+      <list_default>1</list_default>
+      <force_list_default>0</force_list_default>
+      <show_description>1</show_description>
+    </field>
+
+    <display>
+      <type>statisk</type>
+      <field>field_bilde</field>
+      <label>hidden</label>
+      <teaser>lite_linked</teaser>
+      <full>stort_default</full>
+      <rss>
+        <format>lite_linked</format>
+      </rss>
+    </display>
+
+    <display>
+      <type>statisk</type>
+      <group>patterns_test</group>
+      <label>hidden</label>
+      <teaser>no_style</teaser>
+      <full>fieldset_collapsible</full>
+      <rss>
+        <format>hidden</format>
+        <exclude>1</exclude>
+      </rss>
+    </display>
+    
+    <menu_item>
+      <menu>Primary Links</menu>
+      <title>Hjem</title>
+      <path>[front]</path>
+      <weight>-10</weight>
+    </menu_item>
+    
+    <menu_item>
+      <menu>Primary Links</menu>
+      <title>Om oss</title>
+      <path>user</path>
+      <weight>-8</weight>
+    </menu_item>
+    
+    <menu_item>
+      <menu>Primary Links</menu>
+      <title>Kontakt oss</title>
+      <path>user</path>
+      <weight>-5</weight>
+      <parent>About</parent>
+    </menu_item>
+    
+    <menu_item>
+      <menu>Primary Links</menu>
+      <title>Media</title>
+      <path>user</path>
+      <weight>-7</weight>
+    </menu_item>              
+
+    <role>admin</role>
+    
+    <role>redaktør</role>
+    
+    <user>
+      <name>perandre</name>
+      <password>test</password>
+      <mail>perandre@peshmedia.no</mail>
+      <roles>
+        <role>admin</role>
+        <role>redaktør</role>
+      </roles>
+      <contact>0</contact>
+      <timezone>+0100</timezone>
+    </user>
+
+    <!-- 
+      set permissions
+      NOTE: all the permissions set for this role from before will be preserved 
+      and only updated with the ones defined in this action - this is default
+      behaviour
+    -->
+    <permissions role="admin">access comments, administer blocks</permissions>  
+
+    <permissions role="redaktør">
+      <value>access comments</value>
+      <value>administer blocks</value>
+      <value>access comments</value>
+      <value>use PHP for block visibility</value>
+      <value>post comments</value>
+    </permissions>
+
+    <!-- 
+      Set default theme. All other themes will be disabled at the same time.
+    -->
+    <theme>garland</theme>    
+
+    <!-- create custom block -->
+    <block>
+      <title>Footer</title>
+      <info>Siden trenger en footer</info>
+      <body>© 2009</body>
+      <visibility>1</visibility>
+      <theme>garland</theme>
+      <status>1</status>
+      <weight>-6</weight>
+      <region>footer</region>
+    </block>   
+
+    <variables>
+      <variable name="site_name">pesh media pattern</variable>
+      <variable name="site_mail">perandre@peshmedia.no</variable>
+      <variable name="site_slogan" delete="1">Drupal prosjekt</variable>
+    </variables>
+
+    <variables>
+      <variable name="site_frontpage">node</variable>
+    </variables>
+
+    <variable name="site_mission">Porting Patterns module to Drupal 6</variable>
+
+    <variable name="site_footer">Site footer by pm</variable>
+    
+    <!-- 
+    delete variable
+    <variable name="site_footer" delete="1">Configured by Drupal Patterns Module</variable>
+    -->
+    
+    <variable>
+      <name>site_footer</name>
+      <delete>1</delete>
+    </variable>
+
+    <pathauto>
+      <separator>-</separator>
+      <punctuation_underscore>0</punctuation_underscore>
+      <node>
+        <default>[title-raw]</default>
+        <blog>blogg/[title-raw]</blog>
+        <page>[title-raw]</page>
+      </node>
+      <taxonomy>
+        <default>tag/[vocab-raw]/[catpath-raw]</default>
+      </taxonomy>
+      <user_pattern>bruker/[user-raw]</user_pattern>
+    </pathauto>
+
+    <node>
+      <type>statisk</type>
+      <title>Om oss</title>
+      <teaser_js>Summary text that will not be displayed on the full node page.</teaser_js>
+      <body>
+<![CDATA[
+By wrapping our text with CDATA, we are allowed to use <strong>HTML</strong> mark up.
+
+Enter text in the exactly same way as you would do it in the regular node edit form.
+
+<ul>
+  <li>item 1</li>
+	<li>item 2</li>
+	<li>item 3</li>
+</ul>	 
+]]>
+      </body>
+      <format>2</format>
+      <teaser_include>0</teaser_include>
+			<promote>1</promote>
+			<comment>0</comment>
+    </node>
+
+  </actions>  
+</pattern>

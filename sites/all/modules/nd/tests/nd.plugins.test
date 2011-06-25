@@ -1,0 +1,87 @@
+<?php
+// $Id: nd.plugins.test,v 1.1.2.4.2.4 2010/01/28 17:53:02 swentel Exp $
+
+/**
+ * @file
+ * Tests for Node displays (plugins)
+ */
+
+class NodeDisplaysPlugins extends DrupalWebTestCase {
+  /**
+   * Implementation of getInfo().
+   */
+  function getInfo() {
+    return array(
+      'name' => t('ND plugins'),
+      'description' => t('Tests for ND plugins.'),
+      'group' => t('Display suite'),
+    );
+  }
+
+  /**
+   * Implementation of setUp().
+   */
+  function setUp() {
+    parent::setUp('ds', 'nd');
+  }
+
+  /**
+   * Helper function to build an object.
+   * @param stdClass $object A node.
+   * @param $build_mode The build mode for the node.
+   */
+  function _nd_build_object($object, $build_mode = NODE_BUILD_NORMAL, $teaser = FALSE, $page = TRUE) {
+    $object_loaded = node_load($object->nid, array(), TRUE);
+    $object_loaded->build_mode = $build_mode;
+    $object_rendered = node_build_content($object_loaded, $teaser, $page);
+    node_invoke_nodeapi($object_rendered, 'alter', $teaser, $page);
+    return $object_rendered;
+  }
+
+  /**
+   * Tests for plugins.
+   */
+  function testPlugins() {
+    $admin_user = $this->drupalCreateUser(array('administer nodes', 'access display suite', 'administer nd', 'configure layout for nd', 'export and import settings', 'revert overridden settings', 'use PHP in custom fields'));
+    $this->drupalLogin($admin_user);
+
+    $plugin_settings = variable_get('nd_plugin_settings', array());
+    $this->assertEqual($plugin_settings, array(), t('Plugin settings is empty'), t('Plugin tests'));
+
+    // Enable the emptyregionrender plugin.
+    $edit = array(
+      'plugin_emptyregionrender' => TRUE,
+    );
+    $this->drupalPost('admin/ds/nd/plugins', $edit, t('Save'));
+
+    $plugin_settings = variable_get('nd_plugin_settings', array());
+    $this->assertTrue(isset($plugin_settings['emptyregionrender']), t('Empty region render enabled.'), t('Plugin tests'));
+
+    $page_node = $this->drupalCreateNode();
+
+    // First post.
+    $edit = array(
+      'title[full][region]' => 'header',
+      'author[full][region]' => 'middle',
+      'body[full][region]' => 'middle',
+    );
+    $this->drupalPost('admin/ds/layout/page/full', $edit, t('Save'));
+
+    // Test that footer is not rendered with the emptyregionrender plugin enabled.
+    $this->drupalGet('node/'. $page_node->nid);
+    $this->assertNoRaw('ds-region-footer', t('Footer is not rendered.'), t('Plugin tests'));
+
+    // Save again.
+    $edit = array(
+      'title[full][region]' => 'header',
+      'author[full][region]' => 'middle',
+      'body[full][region]' => 'middle',
+      'emptyregionrender[region-render-footer]' => TRUE,
+    );
+    $this->drupalPost('admin/ds/layout/page/full', $edit, t('Save'));
+
+    // Test that footer is rendered with the emptyregionrender plugin enabled.
+    $this->drupalGet('node/'. $page_node->nid);
+    $this->assertRaw('ds-region-footer', t('Footer is rendered.'), t('Plugin tests'));
+  }
+}

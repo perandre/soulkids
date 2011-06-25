@@ -1,0 +1,45 @@
+; $Id: basic.info,v 1.1.2.4.2.1 2009/05/05 17:22:09 couzinhub Exp $
+
+name = basic
+description = Basic starter theme for Drupal 6
+screenshot = screenshot.gif
+engine = phptemplate
+
+regions[left] = Left sidebar
+regions[right] = Right sidebar
+regions[content_top] = Content Top
+regions[content_bottom] = Content Bottom
+regions[header] = Header
+regions[footer_block] = Footer
+
+features[] = logo
+features[] = name
+features[] = slogan
+features[] = mission
+features[] = node_user_picture
+features[] = comment_user_picture
+features[] = search
+features[] = favicon
+features[] = primary_links
+
+; disabled features, uncomment to activate
+; features[] = secondary_links
+
+stylesheets[all][] = css/default.css
+stylesheets[all][] = css/tabs.css
+stylesheets[all][] = css/layout.css
+stylesheets[all][] = css/style.css
+stylesheets[print][] = css/print.css
+             
+settings[basic_block_editing]        = 1
+settings[basic_rebuild_registry]     = 0
+
+version = "6.x-2.1"
+core = "6.x"
+project = "basic"
+; Information added by drupal.org packaging script on 2009-05-05
+version = "6.x-2.2"
+core = "6.x"
+project = "basic"
+datestamp = "1241549423"
+

@@ -1,0 +1,11 @@
+<?php
+// $Id: cck_blocks.install,v 1.1.2.5 2009/11/04 21:32:51 forschi Exp $
+
+/**
+ * Change the cache setting of existing CCK blocks to BLOCK_NO_CACHE.
+ */
+function cck_blocks_update_6000() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {blocks} SET cache = -1 WHERE module = 'cck_blocks' AND cache = 1");
+  return $ret;
+}

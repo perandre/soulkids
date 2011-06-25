@@ -1,0 +1,16 @@
+; $Id: flvmediaplayer_asset.info,v 1.1.2.1.4.2 2009/01/02 21:31:18 arthuregg Exp $
+name = FLV Media Player Asset Integration
+description = Integrate FLV Media Player with Asset Module
+package = "Asset"
+core = 6.x
+dependencies[] = swfobject_api
+dependencies[] = xspf_playlist
+dependencies[] = asset
+
+
+; Information added by drupal.org packaging script on 2009-03-02
+version = "6.x-1.0-beta3"
+core = "6.x"
+project = "flvmediaplayer"
+datestamp = "1236002475"
+

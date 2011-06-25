@@ -1,0 +1,15 @@
+; $Id: imagebrowser.info,v 1.2.2.5 2009/07/19 14:30:50 starnox Exp $
+name = Image Browser
+description = A simple and beautiful image browser/manager for Drupal and FCKEditor.
+core = 6.x
+package = "Image"
+dependencies[] = imageapi
+dependencies[] = image
+dependencies[] = views
+dependencies[] = fckeditor
+; Information added by drupal.org packaging script on 2009-07-19
+version = "6.x-1.0-rc1"
+core = "6.x"
+project = "imagebrowser"
+datestamp = "1248014456"
+

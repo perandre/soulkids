@@ -1,0 +1,11 @@
+; $Id: addanother.info,v 1.1 2009/01/11 21:09:20 robinmonks Exp $
+name = Add Another
+description = "Presents users with an option to create another node of the same type after a node is added."
+core = 6.x
+
+; Information added by drupal.org packaging script on 2009-02-04
+version = "6.x-1.3"
+core = "6.x"
+project = "addanother"
+datestamp = "1233759303"
+

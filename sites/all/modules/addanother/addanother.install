@@ -1,0 +1,29 @@
+<?php
+// $Id: addanother.install,v 1.1 2009/01/15 23:22:22 robinmonks Exp $
+/**
+ * @file
+ * Uninstall and update routines for AddAnother module.
+ */
+/**
+ * Implementation of hook_uninstall().
+ */
+function addanother_uninstall() {
+  variable_del('addanother_nodetypes');
+}
+/**
+ * Port over to the new variable storage system.
+ */
+function addanother_update_1() {
+  $types = node_get_types();
+  $addanother_nodetypes = array();
+  foreach ($types as $type) {
+    $typeid = $type->type;
+    $keep = variable_get('addanother_'. $typeid, 0);
+    if ($keep) {
+      $addanother_nodetypes[$typeid] = $typeid;
+    }
+    variable_del('addanother_'. $typeid);
+  }
+  variable_set('addanother_nodetypes', $addanother_nodetypes);
+  return array();
+}

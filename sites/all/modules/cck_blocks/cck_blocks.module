@@ -1,0 +1,105 @@
+<?php
+// $Id: cck_blocks.module,v 1.2.2.8 2009/11/04 21:32:51 forschi Exp $
+
+/**
+ * Implementation of hook_content_build_modes().
+ */
+function cck_blocks_content_build_modes() {
+  return array(
+    'cck_blocks' => array(
+      'title' => t('CCK Blocks'),
+      'build modes' => array(
+        'cck_blocks' => array(
+          'title' => t('CCK Blocks'),
+          'views style' => FALSE,
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function cck_blocks_block($op = 'list', $delta = 0, $edit = array()) {
+  static $built_nodes = NULL;
+  
+  $fields = module_invoke('content', 'fields');
+
+  switch ($op) {
+
+    case 'list':
+      $blocks = array();
+    
+      if (count($fields)) {
+        foreach($fields as $field_name => $field_info) {
+          $blocks[$field_name] = array(
+            'info' => 'CCK: '.($field_info['widget']['label'] ? $field_info['widget']['label'] : $field_name),
+            'cache' => BLOCK_NO_CACHE,
+          );
+        }
+      }
+      return $blocks;
+    
+    case 'configure':
+      // add token help, if token module is installed
+      if (module_exists('token')) {
+        $form = array();
+        $form['view']['token_help'] = array(
+          '#title' => t('Replacement patterns'),
+          '#type' => 'fieldset',
+          '#collapsible' => TRUE,
+          '#collapsed' => TRUE,
+          '#description' => t('Prefer raw-text replacements for text to avoid problems with HTML entities!'),
+        );
+
+        $form['view']['token_help']['help'] = array(
+          '#value' => theme('token_help', 'node'),
+        );
+        return $form;
+      }
+
+    case 'view':
+      $block = array();
+    
+      if (arg(0) == 'node' && is_numeric(arg(1)) && !arg(2) && $fields[$delta]) {
+        $nid = arg(1);
+        if (!isset($built_nodes[$nid])) {
+          // Build the node in the cck_blocks mode. This is based on node_build_content().
+          $node = node_load($nid);
+          $node->build_mode = 'cck_blocks';
+
+          // Remove the delimiter (if any) that separates the teaser from the body.
+          $node->body = isset($node->body) ? str_replace('<!--break-->', '', $node->body) : '';
+
+          // The 'view' hook can be implemented to overwrite the default function
+          // to display nodes.
+          if (node_hook($node, 'view')) {
+            $node = node_invoke($node, 'view', $teaser, $page);
+          }
+          else {
+            $node = node_prepare($node, $teaser);
+          }
+
+          // Allow modules to make their own additions to the node.
+          node_invoke_nodeapi($node, 'view', $teaser, $page);
+          $built_nodes[$nid] = $node;
+        }
+        
+        if (isset($built_nodes[$nid]->content[$delta])) {
+          // evaluate tokens, if token module is installed
+          if (module_exists('token')) {
+            $result = db_query("SELECT title FROM {blocks} WHERE delta = '".$delta."' ");
+            $object = db_fetch_object($result);
+            if($object->title){
+              $block['title'] = token_replace($object->title,'node',$node);
+            }
+          }          
+          $block['subject'] = t($fields[$delta]['widget']['label'] ? $fields[$delta]['widget']['label'] : $delta);
+          $block['content'] = drupal_render($built_nodes[$nid]->content[$delta]);
+        }
+      }
+  }
+
+  return $block;
+}

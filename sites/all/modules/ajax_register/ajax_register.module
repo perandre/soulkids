@@ -1,0 +1,116 @@
+<?php
+//$Id: ajax_register.module,v 1.1.2.1 2009/06/07 18:39:03 compujohnny Exp $
+ /*
+  * @file
+  * This module provides a block with 2 links (Login, Register) for the anonymous user
+  * When the user clicks on Login or register the requested form appears in a nice ajax popup
+  * The login and register forms can validate using ajax and not redirect on error
+  * On success the module redirects to the user page
+  * When user is logged in, the block provides a Welcome !username message and a link to the user page
+  * and a logout link.
+  */
+
+/*
+ * Implementing hook_init
+ */
+function ajax_register_init() {
+  //Declare the thickbox image path
+  $path = 'var tb_pathToImage ="'. drupal_get_path('module', 'ajax_register') .'/images/loading.gif";';
+  drupal_add_js($path, 'inline');
+  drupal_add_js(drupal_get_path('module', 'ajax_register') ."/thickbox.js");
+  drupal_add_css(drupal_get_path('module', 'ajax_register') ."/thickbox.css");
+}
+
+ /*
+  * Implementing hook_block
+  */
+
+function ajax_register_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+  $blocks[0] = array(
+  'info' => t('Ajax register'),
+  );
+  return $blocks;
+  }
+  if ($op == 'view') {
+  if ($delta == 0) {
+  $block['subject'] = t('ajax_register');
+  $block['content'] = ajax_get_login_block_content();
+  return $block;
+  }
+  }
+}
+
+ /*
+  * Implementing hook_menu
+  */
+function ajax_register_menu() {
+$items = array();
+$items['ajax_register/login'] = array(
+  'title' => 'Ajax register login',
+  'page callback' => 'ajax_register_get_ajax_login_form',
+  'access arguments' => array('access content'),
+  'type' => MENU_CALLBACK,
+);
+$items['ajax_register/register'] = array(
+  'title' => 'Ajax register sign up',
+  'page callback' => 'ajax_register_get_ajax_register_form',
+  'access arguments' => array('access content'),
+  'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+ /*
+  * Implementing hook_form_alter
+  */
+
+function ajax_register_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'user_login') {
+  //Set form to work with ajax
+  $form['#ajax'] = array(
+  'enabled' => TRUE
+  );
+  }
+  else if ($form_id == 'user_register') {
+  //Set form to work with ajax
+  $form['#ajax'] = array(
+  'enabled' => TRUE
+  );
+  }
+}
+
+function ajax_get_login_block_content() {
+  global $user;
+  //Check if clean urls is enabled
+  if (!variable_get('clean_url', 0)) {
+  $user_uri = base_path() ."?q=user/". $user->uid;
+  $login_uri = base_path() ."?q=ajax_register/login";
+  $register_uri = base_path() ."?q=ajax_register/register";
+  $logout_uri = base_path() ."?q=logout";
+  }
+  else {
+  $user_uri = base_path() ."user/". $user->uid;
+  $login_uri = base_path() ."ajax_register/login";
+  $register_uri = base_path() ."ajax_register/register";
+  $logout_uri = base_path() ."logout";
+  }
+  if (user_is_anonymous()){
+    $block_content = "<div id='ajax_register_block_anonymous'><a href='". $login_uri ."?height=250' class='thickbox'>". t('Login') ."</a><br/><a href=". $register_uri ." class='thickbox'>". t('Register') ."</a></div>";
+    return $block_content;
+  }
+  else{
+    $block_content = "<div id='ajax_register_block_authenticated'><p>".t("Welcome :")."<br/><span class='ajax_register_user_name'>". $user->name ."</span></p><a href='". $user_uri ."'>". t('My Account') ."</a><br/><a href='". $logout_uri ."'>". t('Logout') ."</a></div>";
+    return $block_content;
+	}
+}
+
+function ajax_register_get_ajax_login_form() {
+  //prints the html of the form to the ajax url request
+  print drupal_get_form('user_login');
+}
+
+function ajax_register_get_ajax_register_form() {
+  //prints the html of the form to the ajax url request
+  print drupal_get_form('user_register');
+}

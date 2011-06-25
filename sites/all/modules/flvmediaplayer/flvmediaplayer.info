@@ -1,0 +1,12 @@
+; $Id: flvmediaplayer.info,v 1.2.2.2.2.1.2.3 2009/01/12 15:02:30 arthuregg Exp $
+name = FLV Media Player
+description = Render a flash player on selected media types
+package = "Media"
+dependencies[] = swfobject_api
+core = 6.x
+; Information added by drupal.org packaging script on 2009-03-02
+version = "6.x-1.0-beta3"
+core = "6.x"
+project = "flvmediaplayer"
+datestamp = "1236002475"
+

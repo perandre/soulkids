@@ -1,0 +1,29 @@
+<?php
+// $Id: galleria.install,v 1.1.2.8 2009/05/18 08:34:16 marktheunissen Exp $
+
+/**
+ * @file
+ * Install file for the Galleria module.
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function galleria_uninstall() {
+  variable_del('galleria_thumb_opacity');
+  variable_del('galleria_show_page_warning');
+  variable_del('galleria_imagecache_preset');
+  variable_del('galleria_thumb_imagecache_preset');
+  variable_del('galleria_jcarousel');
+  variable_del('galleria_jcarousel_vertical');
+  variable_del('galleria_jcarousel_visible');
+  variable_del('galleria_jcarousel_scroll');
+  variable_del('galleria_jcarousel_animation');
+  variable_del('galleria_jcarousel_wrap');
+  variable_del('galleria_lightbox');
+  variable_del('galleria_lightbox_preset');
+  $node_types = node_get_types('names');
+  foreach ($node_types as $type) {
+    variable_del("galleria_$type");
+  }
+}

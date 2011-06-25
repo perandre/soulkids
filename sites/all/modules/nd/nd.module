@@ -1,0 +1,375 @@
+<?php
+// $Id: nd.module,v 1.1.2.123.2.20 2010/01/29 16:27:19 swentel Exp $
+
+/**
+ * @file
+ * Node displays.
+ */
+
+/**
+ * Implementation of hook_registry_alter().
+ */
+function nd_theme_registry_alter(&$registry) {
+  $path = drupal_get_path('module', 'nd') .'/templates';
+  array_unshift($registry['node']['theme paths'], $path);
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function nd_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+
+  switch ($op) {
+    // Add has body property.
+    case 'load':
+      $node->has_body = node_get_types('type', $node->type)->has_body;
+      break;
+
+    // Determine build mode.
+    case 'view':
+      if ($node->build_mode == NODE_BUILD_RSS) {
+        // For the RSS build mode, we need to manipulate right now.
+        _nd_nodeapi($node);
+      }
+      elseif ($node->build_mode == NODE_BUILD_PREVIEW) {
+        $node->build_mode = $teaser == TRUE ? 'teaser' : 'full';
+        $node->has_body = node_get_types('type', $node->type)->has_body;
+      }
+      elseif ($node->build_mode === NODE_BUILD_NORMAL) {
+        $build_mode = ($page) ? 'full' : 'teaser';
+        $node->build_mode = $build_mode;
+      }
+
+      if ($node->build_mode == 'teaser' && $node->sticky == 1) {
+        $node->build_mode = 'sticky';
+      }
+      break;
+
+    // Alter the node object for viewing.
+    case 'alter':
+      // We ignore the RSS build mode, which is handled in the view operation.
+      if ($node->build_mode == NODE_BUILD_RSS) {
+        return;
+      }
+      _nd_nodeapi($node);
+      break;
+  }
+}
+
+/**
+ * Helper function to alter node properties
+ *
+ * @param stdClass $node The complete node object.
+ */
+function _nd_nodeapi(&$node) {
+
+  // Build fields and regions.
+  ds_build_fields_and_regions($node, 'nd');
+
+  // Special support for RSS.
+  if ($node->build_mode == NODE_BUILD_RSS && $node->render_by_ds == TRUE) {
+    $node->content['body']['#access'] = FALSE;
+    foreach (element_children($node->content) as $key => $field) {
+      if (!isset($node->ds_fields[$field])) {
+        $node->content[$field]['#access'] = FALSE;
+      }
+      elseif (isset($node->ds_fields[$field]) && $node->ds_fields[$field]['type'] == 'nd') {
+        $key = $field .'_rendered';
+        $field_key = strtr($key, '_', '-');
+        $node->content[$field]['#value'] = theme('ds_field', $node->{$key}, $field, $node->ds_fields[$field]);
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of moduleName_preprocess_hook().
+ * The node data will be rendered in regions. This uses a helper function
+ * so themers/developers can call that helper function from within
+ * their preprocess_hooks if they are fiddling with some data. For information
+ * about this decision see http://drupal.org/node/570592 (issue) and
+ * http://drupal.org/node/572614 for information on howto implement.
+ */
+function nd_preprocess_node(&$vars, $hook) {
+  if (!variable_get('nd_preprocess_override', FALSE)) {
+    _nd_preprocess_node($vars, $hook);
+  }
+}
+
+/**
+ * Helper function used in either nd_preprocess_node or other preprocess function.
+ */
+function _nd_preprocess_node(&$vars, $hook) {
+
+  $node = $vars['node'];
+
+  // Add nd-content_type-build_mode(-nid) template suggestion.
+  $vars['template_files'][] = 'nd';
+  $vars['template_files'][] = 'nd-'. $node->type;
+  $vars['template_files'][] = 'nd-'. $node->type .'-'. $node->build_mode;
+  $vars['template_files'][] = 'nd-'. $node->type .'-'. $node->build_mode .'-'. $node->nid;
+
+  // Break all the rendering if needed.
+  if (!$node->render_by_ds) {
+    $vars['template_files'][] = 'node';
+    return;
+  }
+
+  $content = ds_render_content($node, 'nd', $vars);
+  $vars['content'] = $content;
+}
+
+/**
+ * Render the node object through the DS views plugin.
+ *
+ * @param array $vars The variables to manipulate.
+ * @param string $build_mode The build mode to use on this object.
+ */
+function ds_views_row_node(&$vars, $build_mode) {
+  $nid = $vars['row']->nid;
+  if (!is_numeric($nid)) {
+    return;
+  }
+
+  $node = node_load($nid);
+  if (empty($node)) {
+    return;
+  }
+
+  $node->build_mode = $build_mode;
+
+  // Check the teaser flag and show_links flag.
+  $teaser = ($node->build_mode != 'full') ? TRUE : FALSE;
+  $show_links = ds_show_links($node->type, $build_mode);
+
+  // Build object.
+  $vars['object'] = node_view($node, $teaser, FALSE, $show_links);
+}
+
+/**
+ * Implementation of hook_content_build_modes().
+ */
+function nd_content_build_modes() {
+  $build_modes = array(
+    'nd' => array(
+      'title' => t('Node displays'),
+      'build modes' => array(
+        'full' => array(
+          'title' => t('Full node'),
+          'weight' => -1,
+        ),
+        'teaser' => array(
+          'title' => t('Teaser'),
+          'weight' => 1,
+        ),
+        'sticky' => array(
+          'title' => t('Sticky'),
+          'weight' => 2,
+        ),
+        NODE_BUILD_RSS => array(
+          'title' => t('RSS'),
+          'weight' => 3,
+        )
+      )
+    )
+  );
+
+  return $build_modes;
+}
+
+/**
+ * Implementation of hook_ds_api().
+ */
+function nd_ds_api() {
+
+  $help = array(
+    t('<h3>Node displays</h3>
+      <p>This module comes with a nd.tpl.php, available in the templates folder, which is optimized for use with Node Displays. You can copy the file to your themes folder to use your own version if you want.</p>
+      <p>You can create a file called <strong>nd-<em>node_type</em>.tpl.php</strong>, <strong>nd-<em>node_type</em>-<em>build_mode</em>.tpl.php</strong> or <strong>nd-<em>node_type</em>-<em>build_mode</em>-<em>nid</em>.tpl.php</strong> for even more fine-grained theming.</p>
+      <p>If you exclude the RSS build mode, the default node feed is generated, but might render strange content. Make sure you do not choose the "Titles only" as your feed content setting, otherwhise, this screen will not have any effect. Choosing either "Full text" or "Titles + teaser" does not matter, this screen will have effect on both settings, apart from the read more link. Remember that some fields like upload and terms are added automatically to the feed and that this manipulates the $description variable, it does not add extra keys to the feed.</p>')
+  );
+
+  return array(
+    'title' => 'Node displays',
+    'module' => 'nd',
+    'object' => 'node',
+    'views_base' => 'node',
+    'types' => 'node_get_types',
+    'extra' => array('has_body'),
+    'plugins_exclude' => array(NODE_BUILD_RSS),
+    'regions_single' => array(NODE_BUILD_RSS),
+    'help' => $help,
+  );
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function nd_theme() {
+ $theme_functions = array();
+
+  // Formatter theming functions.
+  $formatters = array(
+    'nd_bodyfield', 'nd_title_h1_nolink', 'nd_title_h1_link', 'nd_title_h2_nolink', 'nd_title_h2_link',
+    'nd_title_h2_block_nolink', 'nd_title_h2_block_link', 'nd_title_p_nolink', 'nd_title_p_link',
+  );
+
+  foreach ($formatters as $formatter) {
+    $theme_functions[$formatter] = array(
+      'arguments' => array('node' => NULL),
+    );
+  }
+
+  return $theme_functions;
+}
+
+/**
+ * Implementation of hook_ds_fields().
+ */
+function nd_ds_fields($type_name, $build_mode, $extra) {
+
+  $fields = array(
+    'title' => array(
+      'title' => t('Title'),
+      'formatters' => array(
+        'nd_title_h1_nolink' => t('H1 title'),
+        'nd_title_h1_link' => t('H1 title, linked to node'),
+        'nd_title_h2_nolink' => t('H2 title'),
+        'nd_title_h2_link' => t('H2 title, linked to node'),
+        'nd_title_h2_block_nolink' => t('H2 block title'),
+        'nd_title_h2_block_link' => t('H2 block title, linked to node'),
+        'nd_title_p_nolink' => t('Paragraph title'),
+        'nd_title_p_link' => t('Paragraph title, linked to node'),
+      ),
+      'type' => DS_FIELD_TYPE_THEME,
+      'status' => DS_FIELD_STATUS_STATIC,
+    ),
+    'author' => array(
+      'title' => t('Author'),
+      'formatters' => array(
+        'ds_author_nolink' => t('Author'),
+        'ds_author_link' => t('Author linked to profile')
+      ),
+      'type' => DS_FIELD_TYPE_THEME,
+      'status' => DS_FIELD_STATUS_STATIC,
+    ),
+    'links' => array(
+      'title' => t('Links'),
+      'type' => DS_FIELD_TYPE_PREPROCESS,
+      'status' => DS_FIELD_STATUS_STATIC,
+    ),
+    'read_more' => array(
+      'title' => t('Read more'),
+      'type' => DS_FIELD_TYPE_CODE,
+      'properties' => array('code' => '<?php echo l(t("Read more"), "node/$object->nid"); ?>'),
+      'status' => DS_FIELD_STATUS_DEFAULT,
+    ),
+    'post_date' => array(
+      'title' => t('Post date'),
+      'type' => DS_FIELD_TYPE_CODE,
+      'properties' => array('code' => '<?php echo format_date($object->created, "custom", "d/m/Y"); ?>'),
+      'status' => DS_FIELD_STATUS_DEFAULT,
+    ),
+  );
+
+  // Check for body.
+  if (isset($extra['has_body']) && $extra['has_body'] == TRUE) {
+    $fields['body'] = array(
+      'title' => t('Core body'),
+      'formatters' => array(
+        'nd_bodyfield' => t('Default')
+      ),
+      'type' => DS_FIELD_TYPE_THEME,
+      'status' => DS_FIELD_STATUS_STATIC,
+    );
+  }
+
+  if (module_exists('taxonomy')) {
+    $fields['terms'] = array(
+      'title' => t('Taxonomy'),
+      'type' => DS_FIELD_TYPE_PREPROCESS,
+      'status' => DS_FIELD_STATUS_STATIC,
+    );
+  }
+
+  if (module_exists('upload') && $build_mode != 'teaser' && variable_get("upload_$type_name", 1)) {
+    $fields['files'] = array(
+      'title' => t('Core upload'),
+      'type' => DS_FIELD_TYPE_IGNORE,
+      'status' => DS_FIELD_STATUS_STATIC,
+    );
+  }
+
+  if (module_exists('book') && $type_name == 'book') {
+    $fields['book_navigation'] = array(
+      'title' => t('Book navigation'),
+      'formatters' => array(
+        'nd_book_navigation' => t('Book navigation'),
+      ),
+      'type' => DS_FIELD_TYPE_FUNCTION,
+      'status' => DS_FIELD_STATUS_STATIC,
+    );
+  }
+
+  return array('nd' => $fields);
+}
+
+/**
+ * ND theming functions.
+ */
+function theme_nd_bodyfield(&$node) {
+  $node->body_rendered = $node->content['body']['#value'];
+}
+
+function theme_nd_title_h1_nolink(&$node) {
+  $node->title_rendered = '<h1>'. check_plain($node->title) .'</h1>';
+}
+
+function theme_nd_title_h1_link(&$node) {
+  $node->title_rendered = '<h1>'. l($node->title, 'node/'. $node->nid) .'</h1>';
+}
+
+function theme_nd_title_h2_nolink(&$node) {
+  $node->title_rendered = '<h2>'. check_plain($node->title) .'</h2>';
+}
+
+function theme_nd_title_h2_link(&$node) {
+  $node->title_rendered = '<h2>'. l($node->title, 'node/'. $node->nid) .'</h2>';
+}
+
+function theme_nd_title_h2_block_nolink(&$node) {
+  $node->title_rendered = '<h2 class="block-title">'. check_plain($node->title) .'</h2>';
+}
+
+function theme_nd_title_h2_block_link(&$node) {
+  $node->title_rendered = '<h2 class="block-title">'. l($node->title, 'node/'. $node->nid) .'</h2>';
+}
+
+function theme_nd_title_p_nolink(&$node) {
+  $node->title_rendered = '<p>'. check_plain($node->title) .'</p>';
+}
+
+function theme_nd_title_p_link(&$node) {
+  $node->title_rendered = '<p>'. l($node->title, 'node/'. $node->nid) .'</p>';
+}
+
+/**
+ * Book navigation.
+ */
+function nd_book_navigation(&$node, $key, $field) {
+  $content = '';
+  if (isset($node->content['book_navigation'])) {
+    if (isset($node->content['book_navigation']['#value'])) {
+      $content = $node->content['book_navigation']['#value'];
+    }
+    elseif (isset($node->book['bid']) && !empty($node->book['bid'])) {
+      $content = theme('book_navigation', $node->book);
+    }
+  }
+  else {
+    if (isset($node->book['bid']) && !empty($node->book['bid'])) {
+      $content = theme('book_navigation', $node->book);
+    }
+  }
+  $node->book_navigation_rendered = $content;
+}

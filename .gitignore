@@ -1,0 +1,8 @@
+.DS_Store
+sites/default/files
+sites/default/settings.php
+CVS
+backup
+cache
+_MACOSX
+sites/all/modules/contrib/panels/plugins/cache

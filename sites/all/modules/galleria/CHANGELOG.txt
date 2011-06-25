@@ -1,0 +1,59 @@
+// $Id: CHANGELOG.txt,v 1.1.2.32 2009/06/09 09:02:34 marktheunissen Exp $
+
+Galleria 1.0, 2009-06-09
+----------------------
+- [#484022] by worldwidemv: Empty imagefields should not display
+- [#483990] by luron: French translation.
+
+Galleria 1.0-rc2, 2009-06-02
+----------------------
+- [#471500] by Mark Theunissen: alt text for images.
+- [#479566] by Mark Theunissen: only run Galleria routine when unprocessed ones exist.
+
+Galleria 1.0-rc1, 2009-05-20
+----------------------
+- [#431108] by prof1337: compatibility with jQuery 1.3.
+- [#425840] by prof1337: fix display if only one image in galleria.
+- [#444974] by prof1337, Mark Theunissen: Allow non-image uploads on Galleria-enabled nodes.
+- [#444948] by prof1337: Galleria flickers when changing images.
+- [#436354] by prof1337: Galleria images load full size and stack down the page.
+- [#444566] by prof1337: Compatibility with FCKEditor module.
+- [#417756] by prof1337: Option to display thumbnails above or below image.
+- [#342708] by maulwuff, prof1337, Mark Theunissen, mehmeta: CCK imagefield support.
+- [#353642] by prof1337, Mark Theunissen: jCarousel support.
+- [#454078] by petrd: helpful message for rearranging fields.
+- [#455656] by gmclelland, Mark Theunissen: better description on content type edit form.
+- [#371797] by prof1337: opening the main image in a lightbox.
+- [#458448] by prof1337, Mark Theunissen: move markup into template file.
+- [#342708] by Mark Theunissen: images display when limit is set.
+- [#464554] by prof1337: Lightbox image order is not consistent.
+
+Galleria 1.0-beta4, 2009-03-23
+----------------------
+- [#410794] by FrancS: translate previous / next link.
+- [#404998] by Mark Theunissen, smithn.nc: imagecache for thumbnails.
+- [#372264] by Mark Theunissen: option to switch off all warning messages.
+
+Galleria 1.0-beta3, 2009-02-27
+----------------------
+- [#362501] by Mark Theunissen: ensure include files are only added once.
+- [#385782] by smithn.nc: option to turn off warning message.
+- [#350561] by smithn.nc, DRScales: imagecache integration.
+
+Galleria 1.0-beta2, 2009-01-16
+----------------------
+- [#347903] - caption bugfix, changed 'safe' to 'value'.
+- [#349353] - fixed up galleria validation.
+- [#359710] - Display something on the teaser view of a Galleria.
+- [#348432] - Adjust weight of Galleria in CCK settings.
+- [#350519] - Change from iFrame to HTML.
+- [#349138] - Settings configuration forms implemented.
+- [#356700] - Better caption support.
+- [#357116] - Lightbox integration bug.
+- [#359833] - Galleria uninstall function.
+
+Galleria 1.0-beta1, 2008-12-12
+----------------------
+- Initial release
+- [#345267] - added captions
+- [#343852] - body text included in display
